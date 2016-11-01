@@ -61,7 +61,7 @@ Launch node-airplayhub like this:
 $ node-airplayhub --config=/etc/airplayhub.json
 ```
 
-Once you start node-airplayhub you can browse to http://<hostname>:<portnum>/ to select zones and set volume levels.
+Once you start node-airplayhub you can browse to http://[hostname]:[webuiport]/ to select zones and set volume levels.
 
 # Service
 I also included a systemd service file (node-airplayhub.service) which you can edit it to your liking and then place it in /etc/systemd/system then use this command to enable the service:
