@@ -1,5 +1,5 @@
 # Description
-node-airplayhub is an AirPlay server which accepts streams and then streams the audio back out to multiple AirPlay devices with sync support.
+node-airplayhub is an AirPlay server which accepts streams (using nodetunes) and then streams the audio back out to multiple AirPlay devices with sync support (using node_airtunes).
 
 # Installation
 
