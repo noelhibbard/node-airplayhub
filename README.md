@@ -9,7 +9,12 @@ To install this package you will need to install these packages first:
 $ apt-get install -y build-essential git libavahi-compat-libdnssd-dev
 ```
 
-## 2. Config file
+## 2. Install
+``` bash
+$ npm i -g https://github.com/noelhibbard/node-airplayhub.git
+```
+
+## 3. Config file
 The config.json file is simple. Here is an example:
 
 ``` json
@@ -50,7 +55,7 @@ The config.json file is simple. Here is an example:
 
 Place the config file somewhere like this /etc/airplayhub.json
 
-## 3. Launch
+## 4. Launch
 Launch node-airplayhub like this:
 ``` bash
 $ node-airplayhub --config=/etc/airplayhub.json
