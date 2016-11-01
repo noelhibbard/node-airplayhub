@@ -1,0 +1,26 @@
+{
+  "author": {
+    "name": "Noel Hibbard"
+  },
+  "bin": {
+    "node-airplayhub": "./index.js"
+  },
+  "dependencies": {
+    "airtunes": "git+https://github.com/marcokeur/node_airtunes.git",
+    "express": "^4.14.0",
+    "minimist": "^1.2.0",
+    "morgan": "^1.7.0",
+    "nodetunes": "git+https://github.com/Kolky/nodetunes.git"
+  },
+  "description": "./README.md",
+  "devDependencies": {},
+  "license": "ISC",
+  "main": "index.js",
+  "name": "node-airplayhub",
+  "optionalDependencies": {},
+  "readme": "./README.md",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.1.0"
+}

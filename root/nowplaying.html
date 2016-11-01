@@ -1,0 +1,58 @@
+<html>
+
+<head>
+    <title>Now Playing</title>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+
+        function trackinfo() {
+            $.ajax({
+                url: 'trackinfo',
+                type: "get",
+                dataType: "json",
+                success: function(data, textStatus, jqXHR) {
+                    if(data.error) {
+                        $("#art").attr("src", "/genericart.png");
+                        $('#artist').html('');
+                        $('#album').html('');
+                        $('#title').html('');
+                    } else {
+                        $("#art").attr("src", data.albumart);
+                        $('#artist').html(data.asar);
+                        $('#album').html(data.asal);
+                        $('#title').html(data.minm);
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            trackinfo();
+            setInterval(function() {
+                trackinfo();
+            },500);
+        });
+
+    </script>
+</head>
+
+<body style="color: white;background-color: black;">
+    <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-top: -21em;
+        margin-left: -15em;
+    ">
+        <img id="art" src="/genericart.png"/></br>
+        <center>
+        <table style="font-family: sans-serif;font-size: xx-large;text-align: center;">
+            <tr><td id=title></td></tr>                
+            <tr><td id=artist></td></tr>
+            <tr><td id=album></td></tr>
+        </table>
+        </center>
+    </div>
+</body>
+
+</html>
