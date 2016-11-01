@@ -71,6 +71,6 @@ $ systemctl enable node-airplayhub
 
 Then this to start the service:
 ``` bash
-service node-airplayhub start
+$ service node-airplayhub start
 ```
 
