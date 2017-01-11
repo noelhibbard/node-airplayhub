@@ -10,7 +10,8 @@
     "express": "^4.14.0",
     "minimist": "^1.2.0",
     "morgan": "^1.7.0",
-    "nodetunes": "git+https://github.com/Kolky/nodetunes.git"
+    "nodetunes": "git+https://github.com/Kolky/nodetunes.git",
+    "bonjour": "*"
   },
   "description": "./README.md",
   "devDependencies": {},
