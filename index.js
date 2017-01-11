@@ -23,6 +23,7 @@ var http = require('http');
 var airtunes = require('airtunes')
 var airtunesserver = require('nodetunes');
 var fs = require('fs')
+var bonjour = require('bonjour')();
 var connectedDevices = [];
 var trackinfo = {};
 var idleTimer;
@@ -156,3 +157,58 @@ function getArtwork(artist, album, callback) {
         callback('/genericart.png');
     });
 }
+
+function getIPAddress(service) {
+
+        addresses = service.addresses;
+        // Extract right IPv4 address
+        var rx = /^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$/;
+        for ( var a in addresses) {
+                // Test if we can find an ipv4 address
+                if (rx.test(addresses[a]) && addresses[a].lastIndexOf('169', 0) !== 0) {
+                        return addresses[a];
+                        break;
+                }
+        }
+}
+
+function validateDevice(service) {
+
+    // Extract IP address, hostname and port from mdns descriptor
+    service.ip = getIPAddress(service);
+    service.id = service.ip + ":" + service.port;
+
+    // Check whether we know this zone already - if we do, do not add it again
+    var zoneUnknown = true;
+    for (var i in zones) {
+        if (zones[i].name.toLowerCase() == service.host.toLowerCase()) {
+             // Duplicate found which already existed in the config. Mind we match on the fqdn the host claims to have.
+            zoneUnknown = false;
+        }
+    }
+
+    // If it is a new zone, thank you very much, add it and write it to our config
+    // TODO: I re-used the ./config.json used elsewhere in this application. Ideally, it should take the parameter passed in --config and not just 'require' the file but properly read it and parse it and write it back here
+    if (zoneUnknown) {
+        zones.push({"name": service.host , "host": service.ip,"port": service.port, "volume":0, "enabled":false});
+        config.zones = zones;
+        fs.writeFileSync('./config.json', JSON.stringify(config, null, 4));
+    }
+
+};
+
+
+// browse for all raop services
+var browser = bonjour.find({
+        type : 'raop'
+});
+
+browser.on('up', function(service) {
+        validateDevice(service);
+});
+
+browser.on('down', function(service) {
+        // TODO
+});
+
+browser.start();
