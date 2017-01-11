@@ -8,7 +8,7 @@ var config = {
     "idletimout": 600,
     "zones": []
 };
-var configPath = 'config.json';
+var configPath = './config.json';
 
 var argv = require('minimist')(process.argv.slice(2));
 if (argv.h || argv.help) {
@@ -23,7 +23,7 @@ if (argv.h || argv.help) {
 }
 
 try{
-    config = require(configPath)
+    config = require(configPath);
 } catch(e) {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
 }

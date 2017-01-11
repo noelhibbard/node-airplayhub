@@ -46,7 +46,8 @@ The first time you launch node-airplayhub it will generate a config file and aut
             "port": "5000",
             "volume": "50",
             "enabled": false,
-            "hidden": true
+            "hidden": true,
+            "alias": "TV in Livingroom"
         }
     ]
 }
@@ -58,6 +59,7 @@ The first time you launch node-airplayhub it will generate a config file and aut
 - **idletimeout**: This time is set in seconds. When you disconnect or pause output it starts this timer. when the timer expires it turns off all outputs. This is to prevent you from coming back hours later, say 12AM, and acidetially blasting music on your back porch. Setting this to a 0 will disable the idle timout.
 - **zones**: This is where you define which AirPlay destinations you want to have available.
 - **name**: Display name for the destination. This doesn't have to match the actual name of the AirPlay device.
+- **alias**: Alias gives a way to override the name of a zone.
 - **host**: The host name of the AirPlay device.
 - **port**: Port number of the AirPlay device.
 - **volume**: This sets the initial volume level of the AirPlay device but it is updated dinamically as you chantge volume in the WebUI.

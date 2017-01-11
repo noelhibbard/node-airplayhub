@@ -32,10 +32,16 @@ function update(val) {
 }
 function buildControls(data) {
     $('#controls').html('');
+    var name;
     for (var i in data) {
+        if(data[i].alias) {
+            name = data[i].alias;
+        } else {
+            name = data[i].name;
+        }
         $('#controls').append('\r' +
             '       <input id="enabled_' + data[i].name + '" type="checkbox"' + ((data[i].enabled) ? ' checked ' : ' ') + 'class="ios8-switch" />\r' +
-            '       <label for="enabled_' + data[i].name + '">' + data[i].name + '</label></br></br>\r' +
+            '       <label for="enabled_' + data[i].name + '">' + name + '</label></br></br>\r' +
             ((data[i].fixedvol) ? ((data[i].volupurl) ?
             '       <center>\r' + 
             '           <input type="image" src="/icons/volume-up.png" id="volup_' + data[i].name + '" width="32" height="32" />\r' +
