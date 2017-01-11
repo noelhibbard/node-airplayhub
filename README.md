@@ -15,11 +15,11 @@ $ npm i -g https://github.com/noelhibbard/node-airplayhub.git
 ```
 
 ## 3. Config file
-The config.json file is simple. Here is an example:
+The first time you launch node-airplayhub it will generate a config file and automatically populate it with all the AirPlay targets that are advertizing on your network. The default location is ./config.json. If you want to spesify a different location, use the -c or --config option. Here is what the config file looks like:
 
 ``` json
 {
-    "servername": "[Multiroom]",
+    "servername": "[AirPlay Hub]",
     "webuiport": 8089,
     "debug": false,
     "idletimout": 600,
@@ -29,14 +29,24 @@ The config.json file is simple. Here is an example:
             "host": "127.0.0.1",
             "port": "5000",
             "volume": "50",
-            "enabled": false
+            "enabled": false,
+            "hidden": false
         },
         {
             "name": "Room2",
             "host": "127.0.0.1",
             "port": "5001",
             "volume": "50",
-            "enabled": false
+            "enabled": false,
+            "hidden": false
+        },
+        {
+            "name": "Apple TV",
+            "host": "192.168.0.21",
+            "port": "5000",
+            "volume": "50",
+            "enabled": false,
+            "hidden": true
         }
     ]
 }
@@ -52,13 +62,14 @@ The config.json file is simple. Here is an example:
 - **port**: Port number of the AirPlay device.
 - **volume**: This sets the initial volume level of the AirPlay device but it is updated dinamically as you chantge volume in the WebUI.
 - **enabled**: Whether output is enabled or not. This value is also updated dynamically as you turn outputs on and off.
+- **hidden**: There may be some devices you never want to use. In that case you can set the zone to hidden.
 
 Place the config file somewhere like this /etc/airplayhub.json
 
 ## 4. Launch
-Launch node-airplayhub like this:
+Launch node-airplayhub like this to see the command line options:
 ``` bash
-$ node-airplayhub --config=/etc/airplayhub.json
+$ node-airplayhub --help
 ```
 
 Once you start node-airplayhub you can browse to http://[hostname]:[webuiport]/ to select zones and set volume levels.
