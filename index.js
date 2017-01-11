@@ -16,14 +16,14 @@ if (argv.h || argv.help) {
     process.exit();
 } else {
     if (argv.c) {
-        configPath = argv.c;
+        configPath = path.join(__dirname, argv.c);
     } else if (argv.config) {
-        configPath = argv.config;
+        configPath = path.join(__dirname, argv.config);
     }
 }
 
 try{
-    config = require(configPath);
+    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 } catch(e) {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
 }
