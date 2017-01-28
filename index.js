@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+var path = require('path');
 var fs = require('fs')
 var config = {
     "servername": "[AirPlay Hub]",
@@ -31,7 +32,6 @@ try{
 var zones = config.zones;
 var express = require('express');
 var logger = require('morgan');
-var path = require('path');
 var app = express();
 var http = require('http');
 var airtunes = require('airtunes')
