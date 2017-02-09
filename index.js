@@ -59,6 +59,7 @@ server.on('clientDisconnected', (data) => {
                 for (var i in zones) {
                     zones[i].enabled = false;
                 }
+                fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
             });
         }, config.idletimout * 1000);
     }
@@ -104,6 +105,7 @@ app.get('/startzone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -119,6 +121,7 @@ app.get('/stopzone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
