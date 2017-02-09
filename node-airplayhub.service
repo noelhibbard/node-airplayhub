@@ -10,8 +10,8 @@ SyslogIdentifier=node-airplayhub
 
 # Restart, but not more than once every 10 minutes
 Restart=on-failure
-StartLimitBurst=2
-StartLimitInterval=600
+StartLimitBurst=5
+StartLimitInterval=60
 
 [Install]
 WantedBy=multi-user.target
