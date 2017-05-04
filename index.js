@@ -229,7 +229,7 @@ function validateDevice(service) {
 
     // Extract IP address, hostname and port from mdns descriptor
     service.ip = getIPAddress(service);
-    service.id = service.ip + ":" + service.port;
+    //service.id = service.ip + ":" + service.port;
     service.name = service.name.split('@')[1];
 
     // Ignore self
@@ -237,17 +237,28 @@ function validateDevice(service) {
 
     // Check whether we know this zone already - if we do, do not add it again
     var zoneUnknown = true;
+    var zoneChanged = false;
     for (var i in zones) {
         if (zones[i].name.toLowerCase() == service.name.toLowerCase()) {
             // Duplicate found which already existed in the config. Mind we match on the fqdn the host claims to have.
+	    if(service.ip != zones[i].host) {
+		zones[i].host = service.ip;
+		zoneChanged = true;
+	    }
+	    if(service.port != zones[i].port) {
+		zones[i].port = service.port;
+		zoneChanged = true;
+	    }
             zoneUnknown = false;
-        }
+	}
     }
 
     // If it is a new zone, thank you very much, add it and write it to our config
     // TODO: I re-used the ./config.json used elsewhere in this application. Ideally, it should take the parameter passed in --config and not just 'require' the file but properly read it and parse it and write it back here
     if (zoneUnknown) {
         zones.push({ "name": service.name, "host": service.ip, "port": service.port, "volume": 0, "enabled": false, "hidden": false });
+    }
+    if (zoneUnknown || zoneChanged) {
         config.zones = zones;
     }
 };
@@ -271,3 +282,4 @@ browser.on('down', function (service) {
 });
 
 browser.start();
+
