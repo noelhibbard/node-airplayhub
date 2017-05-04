@@ -61,7 +61,6 @@ server.on('clientDisconnected', (data) => {
                 for (var i in zones) {
                     zones[i].enabled = false;
                 }
-                fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
             });
         }, config.idletimout * 1000);
     }
@@ -119,7 +118,6 @@ app.get('/startzone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -135,7 +133,6 @@ app.get('/stopzone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -153,7 +150,6 @@ app.get('/setvol/:zonename/:volume', function (req, res) {
         }
     }
     config.zones = zones;
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -173,7 +169,6 @@ app.get('/hidezone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -186,7 +181,6 @@ app.get('/showzone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -255,11 +249,13 @@ function validateDevice(service) {
     if (zoneUnknown) {
         zones.push({ "name": service.name, "host": service.ip, "port": service.port, "volume": 0, "enabled": false, "hidden": false });
         config.zones = zones;
-        fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     }
-
 };
 
+process.on('SIGTERM', function () {
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
+    process.exit(1);
+});
 
 // browse for all raop services
 var browser = bonjour.find({
