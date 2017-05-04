@@ -7,6 +7,7 @@ var config = {
     "webuiport": 8089,
     "debug": false,
     "idletimout": 600,
+    "mastervolume":-15,
     "zones": []
 };
 var configPath = './config.json';
@@ -46,7 +47,8 @@ server.on('clientConnected', function (stream) {
     stream.pipe(airtunes);
     for (var i in zones) {
         if (zones[i].enabled) {
-            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port, volume: zones[i].volume });
+            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port,
+								volume: compositeVolume(zones[i].volume)});
         }
     }
 });
@@ -76,7 +78,18 @@ server.on('metadataChange', (data) => {
     });
 });
 
+function compositeVolume(vol) {
+    return(config.mastervolume == -144 ? 0:
+	   Math.round(vol*(config.mastervolume+30)/30.));
+}
+    
 server.on('volumeChange', (data) => {
+    config.mastervolume = data;		// -30 to 0dB, or -144 for mute
+    for (var i in zones) {
+        if (zones[i].enabled) {
+	    connectedDevices[i].setVolume(compositeVolume(zones[i].volume));
+	}
+    }
     clearTimeout(idleTimer);
 });
 
@@ -100,7 +113,8 @@ app.get('/startzone/:zonename', function (req, res) {
     var resp = { error: "zone not found" };
     for (var i in zones) {
         if (zones[i].name.toLowerCase() == zonename.toLowerCase()) {
-            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port, volume: zones[i].volume });
+            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port,
+								volume: compositeVolume(zones[i].volume) });
             zones[i].enabled = true;
             resp = zones[i];
         }
@@ -132,9 +146,9 @@ app.get('/setvol/:zonename/:volume', function (req, res) {
     for (var i in zones) {
         if (zones[i].name.toLowerCase() == zonename.toLowerCase()) {
             zones[i].volume = volume;
-            if (connectedDevices[i]) {
-                connectedDevices[i].setVolume(volume);
-            }
+	    if (connectedDevices[i]) {
+		connectedDevices[i].setVolume(compositeVolume(volume));
+	    }
             resp = zones[i];
         }
     }
