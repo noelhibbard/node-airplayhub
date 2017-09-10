@@ -11,7 +11,7 @@ $ apt-get install -y build-essential git libavahi-compat-libdnssd-dev nodejs npm
 
 ## 2. Install
 ``` bash
-$ npm i -g https://github.com/noelhibbard/node-airplayhub.git
+$ npm i -g git+https://github.com/noelhibbard/node-airplayhub
 ```
 
 ## 3. Config file
