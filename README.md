@@ -6,7 +6,7 @@ node-airplayhub is an AirPlay server which accepts streams (using [nodetunes](ht
 ## 1. Pre Reqs
 To install this package you will need to install these packages first:
 ``` bash
-$ apt-get install -y build-essential git libavahi-compat-libdnssd-dev nodejs npm
+$ apt-get install -y build-essential git libavahi-compat-libdnssd-dev nodejs npm nodejs-legacy
 ```
 
 ## 2. Install
