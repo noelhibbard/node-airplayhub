@@ -7,6 +7,7 @@ var config = {
     "webuiport": 8089,
     "debug": false,
     "idletimout": 600,
+    "mastervolume":-15,
     "zones": []
 };
 var configPath = './config.json';
@@ -46,7 +47,8 @@ server.on('clientConnected', function (stream) {
     stream.pipe(airtunes);
     for (var i in zones) {
         if (zones[i].enabled) {
-            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port, volume: zones[i].volume });
+            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port,
+								volume: compositeVolume(zones[i].volume)});
         }
     }
 });
@@ -59,7 +61,6 @@ server.on('clientDisconnected', (data) => {
                 for (var i in zones) {
                     zones[i].enabled = false;
                 }
-                fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
             });
         }, config.idletimout * 1000);
     }
@@ -76,7 +77,18 @@ server.on('metadataChange', (data) => {
     });
 });
 
+function compositeVolume(vol) {
+    return(config.mastervolume == -144 ? 0:
+	   Math.round(vol*(config.mastervolume+30)/30.));
+}
+    
 server.on('volumeChange', (data) => {
+    config.mastervolume = data;		// -30 to 0dB, or -144 for mute
+    for (var i in zones) {
+        if (zones[i].enabled) {
+	    connectedDevices[i].setVolume(compositeVolume(zones[i].volume));
+	}
+    }
     clearTimeout(idleTimer);
 });
 
@@ -100,12 +112,12 @@ app.get('/startzone/:zonename', function (req, res) {
     var resp = { error: "zone not found" };
     for (var i in zones) {
         if (zones[i].name.toLowerCase() == zonename.toLowerCase()) {
-            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port, volume: zones[i].volume });
+            connectedDevices[i] = airtunes.add(zones[i].host, { port: zones[i].port,
+								volume: compositeVolume(zones[i].volume) });
             zones[i].enabled = true;
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -121,7 +133,6 @@ app.get('/stopzone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -132,14 +143,13 @@ app.get('/setvol/:zonename/:volume', function (req, res) {
     for (var i in zones) {
         if (zones[i].name.toLowerCase() == zonename.toLowerCase()) {
             zones[i].volume = volume;
-            if (connectedDevices[i]) {
-                connectedDevices[i].setVolume(volume);
-            }
+	    if (connectedDevices[i]) {
+		connectedDevices[i].setVolume(compositeVolume(volume));
+	    }
             resp = zones[i];
         }
     }
     config.zones = zones;
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -159,7 +169,6 @@ app.get('/hidezone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -172,7 +181,6 @@ app.get('/showzone/:zonename', function (req, res) {
             resp = zones[i];
         }
     }
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     res.json(resp);
 });
 
@@ -221,7 +229,7 @@ function validateDevice(service) {
 
     // Extract IP address, hostname and port from mdns descriptor
     service.ip = getIPAddress(service);
-    service.id = service.ip + ":" + service.port;
+    //service.id = service.ip + ":" + service.port;
     service.name = service.name.split('@')[1];
 
     // Ignore self
@@ -229,23 +237,36 @@ function validateDevice(service) {
 
     // Check whether we know this zone already - if we do, do not add it again
     var zoneUnknown = true;
+    var zoneChanged = false;
     for (var i in zones) {
         if (zones[i].name.toLowerCase() == service.name.toLowerCase()) {
             // Duplicate found which already existed in the config. Mind we match on the fqdn the host claims to have.
+	    if(service.ip != zones[i].host) {
+		zones[i].host = service.ip;
+		zoneChanged = true;
+	    }
+	    if(service.port != zones[i].port) {
+		zones[i].port = service.port;
+		zoneChanged = true;
+	    }
             zoneUnknown = false;
-        }
+	}
     }
 
     // If it is a new zone, thank you very much, add it and write it to our config
     // TODO: I re-used the ./config.json used elsewhere in this application. Ideally, it should take the parameter passed in --config and not just 'require' the file but properly read it and parse it and write it back here
     if (zoneUnknown) {
         zones.push({ "name": service.name, "host": service.ip, "port": service.port, "volume": 0, "enabled": false, "hidden": false });
-        config.zones = zones;
-        fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     }
-
+    if (zoneUnknown || zoneChanged) {
+        config.zones = zones;
+    }
 };
 
+process.on('SIGTERM', function () {
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
+    process.exit(1);
+});
 
 // browse for all raop services
 var browser = bonjour.find({
@@ -261,3 +282,4 @@ browser.on('down', function (service) {
 });
 
 browser.start();
+
